@@ -1,6 +1,38 @@
-# Tauri + SvelteKit
+# CloudWatch Log Viewer
 
-This template should help get you started developing with Tauri and SvelteKit in Vite.
+A desktop application to view AWS CloudWatch Logs more easily and beautifully.
+
+Built with Tauri + SvelteKit.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (using pnpm)
+- Rust and Cargo
+- Tauri CLI
+
+### Installation
+
+```bash
+pnpm install
+```
+
+### Development
+
+```bash
+pnpm tauri dev
+```
+
+## Build
+
+To create a production build:
+
+```bash
+pnpm tauri build
+```
+
+The built app will be created in the `src-tauri/target/release/bundle/` directory.
 
 ## Recommended IDE Setup
 
