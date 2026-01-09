@@ -93,6 +93,7 @@ export function formatDateTimeLocal(date) {
 // 필터 상태 관리
 class Filters {
   searchQuery = $state('');
+  tridQuery = $state(''); // TRID 검색용 별도 필드
   datePreset = $state('1h'); // 기본값: 최근 1시간
   startDate = $state('');
   endDate = $state('');
@@ -107,6 +108,7 @@ class Filters {
         try {
           const parsed = JSON.parse(saved);
           this.searchQuery = parsed.searchQuery || '';
+          this.tridQuery = parsed.tridQuery || '';
           this.datePreset = parsed.datePreset || '1h';
           this.startDate = parsed.startDate || '';
           this.endDate = parsed.endDate || '';
@@ -171,8 +173,8 @@ class Filters {
       return false;
     }
 
-    // 검색어에 trid 설정
-    this.searchQuery = tridValue.trim();
+    // TRID 검색어에 trid 설정 (Detail 검색과 분리)
+    this.tridQuery = tridValue.trim();
 
     // 날짜 범위 설정 (앞 5분 ~ 이후 1시간)
     this.datePreset = 'custom';
@@ -187,6 +189,7 @@ class Filters {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cwlogviewer-filters', JSON.stringify({
         searchQuery: this.searchQuery,
+        tridQuery: this.tridQuery,
         datePreset: this.datePreset,
         startDate: this.startDate,
         endDate: this.endDate,
@@ -223,7 +226,15 @@ class Filters {
   }
 
   // AWS CloudWatch 쿼리용 필터 문자열 생성
+  // TRID 검색과 Detail 검색 중 하나를 사용
   get cloudWatchPattern() {
+    // TRID 검색이 있으면 우선 사용
+    if (this.tridQuery) {
+      // TRID는 일반 텍스트로 검색 (이스케이프 처리)
+      return this.tridQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Detail 검색 쿼리 사용
     if (!this.searchQuery) {
       return null;
     }
@@ -240,6 +251,7 @@ class Filters {
 
   reset() {
     this.searchQuery = '';
+    this.tridQuery = '';
     this.datePreset = '1h';
     this.startDate = '';
     this.endDate = '';
@@ -250,6 +262,7 @@ class Filters {
 
   get isActive() {
     return this.searchQuery !== '' ||
+           this.tridQuery !== '' ||
            this.datePreset !== '1h' ||
            this.startDate !== '' ||
            this.endDate !== '';
